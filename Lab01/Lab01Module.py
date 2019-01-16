@@ -35,20 +35,32 @@ def findLongest() -> int:
     return val
 
 def findSmallest() -> int:
-    pass
+    num = '1'
+    p = 0
+    result = 0
+
+    while (1):
+        p = 0
+        val = int(num) * 1
+        for j in range(1,7):
+            val = val * j
+            if num.find(str(val)):
+                p = p + 1
+            else:
+                j = 7
+        if p == 6:
+            result = val/6
+            break
+        newNum = int(num) + 1
+        num = str(newNum)
 
 
-
-
+    return result
 
 
 # This  block  is  optional
 if __name__  == "__main__":
 # Write  anything  here to test  your  code.
-   r = findLongest()
-   print(r)
-
-
-
+   ...
 
 
