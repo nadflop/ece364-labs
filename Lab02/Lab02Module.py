@@ -22,15 +22,15 @@ def getCodeFor(stateName: str) -> list:
     for i in range(0, len(rawData)):
         newData = str(rawData[i]).split(' ')
         if len(state) > 1:
-            if str(newData[0]) == state[0]:
-                if str(newData[1]) == state[1]:
+            if str(newData[0]).lower() == state[0].lower():
+                if str(newData[1]).lower() == state[1].lower():
                     p = newData[-1].split('\n')
                     if i + 1 != len(rawData):
                         z = p.pop()  # to remove the '\n'
                         z = p.pop()  # get the list as string
                     zipCode.append(z)
         else:
-            if str(newData[0]) == stateName:
+            if str(newData[0]).lower() == stateName.lower():
                 p = newData[-1].split('\n')
                 if i + 1 != len(rawData):
                     z = p.pop()  # to remove the '\n'
@@ -101,9 +101,9 @@ def getMatrixSum(startRowIndex, endRowIndex, startColumnIndex, endColumnIndex):
 # This  block  is  optional
 if __name__  == "__main__":
 # Write  anything  here to test  your  code.
-    z = getCodeFor('New York')
+    z = getCodeFor('OHIO')
     print(z)
-    c = getMinLattitude('New York')
+    c = getMinLattitude('Ohio')
     print(c)
-    d = getMaxLongitude('New York')
+    d = getMaxLongitude('Ohio')
     print(d)
