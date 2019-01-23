@@ -43,8 +43,10 @@ def getMinLattitude(stateName: str) -> float:
 
     for j in range(2, len(rawData)):
         coorData = str(rawData[j]).split(' ')
-        cr = coorData[-1].split('\n')
-        q = cr.pop()
+        cr = str(coorData[-1]).split('\n')
+        if j + 1 != len(rawData):
+            q = cr.pop()
+            q = cr.pop()
         for item in zipCode:
             if q in item:
                 minLat = min(float(coorData[0]), minLat)
@@ -64,12 +66,16 @@ def getMaxLongitude(stateName: str) -> float:
     maxLong = -1000.00
 
     for j in range(2, len(rawData)):
-        coorData = str(rawData[j]).split('         ')
+        coorData = str(rawData[j]).split('             ')
         cr = coorData[-1].split('\n')
-        q = cr.pop()
+        if j + 1 != len(rawData):
+            q = cr.pop()
+            q = cr.pop()
         for item in zipCode:
             if q in item:
-                maxLong = max(float(coorData[1]), maxLong)
+                val = str(coorData[0]).split('         ')
+                new = val.pop()
+                maxLong = max(float(new), maxLong)
 
     return maxLong
 
