@@ -96,7 +96,9 @@ def getMatrixSum(startRowIndex, endRowIndex, startColumnIndex, endColumnIndex):
     DataText = os.path.join(DataPath, "matrix.dat")
     with open(DataText) as f:
         rawData = f.readlines()  # read and return line in files seperately
+
     pass
+
 
 # This  block  is  optional
 if __name__  == "__main__":
