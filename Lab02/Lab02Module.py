@@ -12,6 +12,7 @@ import sys     # Each  one on a line
 DataPath = os.path.expanduser("~ee364/DataFolder/Lab02")
 
 def getCodeFor(stateName: str) -> list:
+    state = stateName.split()
     DataText = os.path.join(DataPath, "zip.dat")
     with open(DataText) as f:
         rawData = f.readlines()  # read and return line in files seperately
@@ -20,11 +21,21 @@ def getCodeFor(stateName: str) -> list:
 
     for i in range(0, len(rawData)):
         newData = str(rawData[i]).split(' ')
-        if str(newData[0]) == stateName:
-            p = newData[-1].split('\n')
-            z = p.pop()  # to remove the '\n'
-            z = p.pop()  # get the list as string
-            zipCode.append(z)
+        if len(state) > 1:
+            if str(newData[0]) == state[0]:
+                if str(newData[1]) == state[1]:
+                    p = newData[-1].split('\n')
+                    if i + 1 != len(rawData):
+                        z = p.pop()  # to remove the '\n'
+                        z = p.pop()  # get the list as string
+                    zipCode.append(z)
+        else:
+            if str(newData[0]) == stateName:
+                p = newData[-1].split('\n')
+                if i + 1 != len(rawData):
+                    z = p.pop()  # to remove the '\n'
+                    z = p.pop()  # get the list as string
+                zipCode.append(z)
 
     zipCode.sort()
     return zipCode
@@ -56,14 +67,14 @@ def getMinLattitude(stateName: str) -> float:
 #----------------------------problem 3-----------------------------------
 
 def getMaxLongitude(stateName: str) -> float:
-    zipCode = [ ]
-    zipCode = getCodeFor(stateName)
+    zipCd = [ ]
+    zipCd = getCodeFor(stateName)
 
     DataText = os.path.join(DataPath, "coordinates.dat")
     with open(DataText) as f:
         rawData = f.readlines()  # read and return line in files seperately
 
-    maxLong = -1000.00
+    maxLong = -99999.00
 
     for j in range(2, len(rawData)):
         coorData = str(rawData[j]).split('             ')
@@ -71,7 +82,7 @@ def getMaxLongitude(stateName: str) -> float:
         if j + 1 != len(rawData):
             q = cr.pop()
             q = cr.pop()
-        for item in zipCode:
+        for item in zipCd:
             if q in item:
                 val = str(coorData[0]).split('         ')
                 new = val.pop()
@@ -90,9 +101,9 @@ def getMatrixSum(startRowIndex, endRowIndex, startColumnIndex, endColumnIndex):
 # This  block  is  optional
 if __name__  == "__main__":
 # Write  anything  here to test  your  code.
-    z = getCodeFor('Florida')
+    z = getCodeFor('New York')
     print(z)
-    c = getMinLattitude('Florida')
+    c = getMinLattitude('New York')
     print(c)
-    d = getMaxLongitude('Florida')
+    d = getMaxLongitude('New York')
     print(d)
