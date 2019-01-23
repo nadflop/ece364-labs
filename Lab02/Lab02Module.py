@@ -79,6 +79,13 @@ def getMaxLongitude(stateName: str) -> float:
 
     return maxLong
 
+#-------------------------------------bonus-----------------------------------------
+def getMatrixSum(startRowIndex, endRowIndex, startColumnIndex, endColumnIndex):
+    #two for loop to iterate through row and column
+    DataText = os.path.join(DataPath, "matrix.dat")
+    with open(DataText) as f:
+        rawData = f.readlines()  # read and return line in files seperately
+    pass
 
 # This  block  is  optional
 if __name__  == "__main__":
