@@ -125,7 +125,7 @@ def getFilter() -> dict:
             v = str(temp)
 
     return resultDict
-
+#-----------------------------------------------------------------------------------------------------------------------
 # This  block  is  optional
 if __name__  == "__main__":
 # Write  anything  here to test  your  code.
