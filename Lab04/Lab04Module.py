@@ -43,7 +43,7 @@ def getDifference(provider1: str, provider2: str) -> set:
 
     return result
 #--------------------------------------------------problem 2------------------------------------------------------------
-def getPriceOf(sbc, provider) -> float:
+def getPriceOf(sbc: str, provider: str) -> float:
     price = 0.00
     filename = provider + '.dat'
     DataFile = os.path.join(DataPath, 'providers')
@@ -121,7 +121,8 @@ def getFilter() -> dict:
                 v = '0' + '0' + temp
             elif len(temp) == 2:
                 v = '0' + temp
-        v = str(temp)
+        else:
+            v = str(temp)
 
     return resultDict
 
