@@ -32,13 +32,17 @@ class Rectangle:
 
     def intersectsWith(self, rect):
         if rect.lowerLeft[0] < self.upperRight[0] and self.lowerLeft[0] < rect.lowerLeft[0]:
-            return True
-        elif rect.upperRight[0] < self.upperRight[0] and self.upperRight[0] < rect.lowerLeft[0]:
-            return True
-        elif rect.lowerLeft[1] < self.upperRight[1] and self.lowerLeft[1] < rect.lowerLeft[1]:
-            return True
-        elif rect.upperRight[1] < self.upperRight[1] and self.upperRight[1] < rect.lowerLeft[1]:
-            return True
+            if rect.lowerLeft[1] < self.upperRight[1] and self.lowerLeft[1] < rect.lowerLeft[1]:
+                return True
+        elif rect.upperRight[0] < self.upperRight[0] and self.lowerLeft[0] < rect.upperRight[0]:
+            if rect.upperRight[1] < self.upperRight[1] and self.lowerLeft[1] < rect.upperRight[1]:
+                return True
+        elif rect.lowerLeft[0] < self.upperRight[0] and self.lowerLeft[0] < rect.lowerLeft[0]:
+            if rect.upperRight[1] < self.upperRight[1] and self.lowerLeft[1] < rect.upperRight[1]:
+                return True
+        elif rect.upperRight[0] < self.upperRight[0] and self.lowerLeft[0] < rect.upperRight[0]:
+            if rect.lowerLeft[1] < self.upperRight[1] and self.lowerLeft[1] < rect.lowerLeft[1]:
+                return True
         else:
             return False
 
