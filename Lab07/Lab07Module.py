@@ -74,7 +74,7 @@ class Circle:
             x1 = pow((cntr[0] - self.center[0]), 2)
             y1 = pow((cntr[1] - self.center[1]), 2)
             distance = sqrt(x1 + y1)
-            if cntr[0] == self.center[0] and cntr[1] == self.center[1]:
+            if cntr == self.center:
                 return True
             elif distance < (self.radius + x):
                 return True
