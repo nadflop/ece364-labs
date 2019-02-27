@@ -55,7 +55,10 @@ class Rectangle:
         y2 = another_rectangle.upperRight[1] - another_rectangle.lowerLeft[1]
         area1 = x1 * y1
         area2 = x2 * y2
-        return area1 == area2
+        if area1 == area2:
+            return True
+        else:
+            return False
 
 class Circle:
 
