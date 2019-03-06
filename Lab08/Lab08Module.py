@@ -6,8 +6,6 @@
 #######################################################
 import os      # List of  module  import  statements
 import sys     # Each  one on a line
-from enum import Enum
-from math import sqrt as sqrt
 # Module  level  Variables. (Write  this  statement  verbatim .)
 #######################################################
 
