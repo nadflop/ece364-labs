@@ -1,0 +1,15 @@
+#! /bin/bash
+########################################################
+# Author: Nur Nadhira Aqilah Binti Mohd Shah
+# Email:  mohdshah@purdue.edu
+# ID:     ee364g02
+# Date:   3/20/2019
+########################################################
+base=~ee364/DataFolder/Lab09
+ProjPath=${base}/maps/projects.dat
+CircPath=${base}/circuits
+StudPath=${base}/maps/students.dat
+
+circ=($(ls -S $CircPath/*.dat | cut -d'_' -f 2 | cut -d'.' -f 1)) 
+#largest file is the first circuit
+grep -h "${circ[0]}" $ProjPath | cut -d' ' -f 15 | sort -u
