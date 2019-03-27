@@ -10,5 +10,5 @@ DataPath=~ee364/DataFolder/Lab10
 Fac=${DataPath}/facilities
 
 echo "FACILITYNAME,FACILITYNUMBER,STREETADDRESS,TELEPHONE"
-grep -h "$1" $Fac/*.json | tr -d '[:blank:]'
+grep -h "$1" $Fac/*.json | tr -d '[:blank:]'  |  cut -d"," -f2-7 | cut -d":" -f2,3,4,5-8
 
