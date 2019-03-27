@@ -109,7 +109,4 @@ def getTagPattern():
 
 #-----------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    print(getCost('35179', '54729'))
-    print(loadPackages())
-    #test1 = Package('3 N. Ocean Court, Victoria, TX 77904', '8 Magnolia Lane, Nanuet, NY 10954')
-
+   ...
