@@ -5,10 +5,10 @@
 # ID:     ee364g02
 # Date:   3/20/2019
 ########################################################
-base=~ee364/DataFolder/Lab09
-ProjPath=${base}/maps/projects.dat
-CircPath=${base}/circuits
-StudPath=${base}/maps/students.dat
+DataPath=~ee364/DataFolder/Lab09
+ProjPath=${DataPath}/maps/projects.dat
+CircPath=${DataPath}/circuits
+StudPath=${DataPath}/maps/students.dat
 
 circ=($(ls -S $CircPath/*.dat | cut -d'_' -f 2 | cut -d'.' -f 1)) 
 #largest file is the first circuit
