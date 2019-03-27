@@ -1,0 +1,17 @@
+-b
+-c
+-d
+-f
+-n
+-s
+--bytes
+--characters
+--complement
+--delimiter
+--fields
+--help
+--only_delimited
+--output-delimiter
+--version
+
+

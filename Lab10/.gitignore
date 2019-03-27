@@ -1,4 +1,6 @@
 *
 !.gitignore
 !*.py
+!*.bash
+!*.txt
 !README
