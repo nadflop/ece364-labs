@@ -5,9 +5,9 @@
 # ID:     ee364g02
 # Date:   3/20/2019
 ########################################################
-base=~ee364/DataFolder/Lab09
-CircPath=${base}/circuits
-StudPath=${base}/maps/students.dat
+DataPath=~ee364/DataFolder/Lab09
+CircPath=${DataPath}/circuits
+StudPath=${DataPath}/maps/students.dat
 
 id=$(grep -h "$1" $StudPath | cut -d'|' -f2 | tr -d '[:space:]')
 
