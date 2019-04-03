@@ -27,25 +27,29 @@ class MathConsumer(QMainWindow, Ui_MainWindow):
                 self.result = float(self.number1) + float(self.number2)
                 self.edtResult.setText(str(self.result))
             except:
-                raise ValueError("number must be a float or an int")
+                self.edtResult.setText('E')
+
         elif operator == '-': #do subtraction
             try:
                 self.result = float(self.number1) - float(self.number2)
                 self.edtResult.setText(str(self.result))
             except:
-                raise ValueError("number must be a float or an int")
+                self.edtResult.setText('E')
+
         elif operator == '*': #do multiplication
             try:
                 self.result = float(self.number1) * float(self.number2)
                 self.edtResult.setText(str(self.result))
             except:
-                raise ValueError("number must be a float or an int")
+                self.edtResult.setText('E')
+
         elif operator == '/': #do division
             try:
                 self.result = float(self.number1) / float(self.number2)
                 self.edtResult.setText(str(self.result))
             except:
-                raise ValueError("number must be a float or an int")
+                self.edtResult.setText('E')
+
         else:
             pass
 
