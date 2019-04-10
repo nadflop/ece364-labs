@@ -171,7 +171,7 @@ def loadPackages():
             #company[name] = [shipment,cost]
 
     result = []
-    
+
     for items in company.keys():
         temp1 = company.get(items)
         temp2 = [items, temp1[0],temp1[1]]
