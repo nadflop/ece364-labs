@@ -187,6 +187,8 @@ def loadPackages():
 
 #-----------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
+   ...
+   '''
    from pprint import pprint as pp
    #pp(getCost('99337','35115'))
    pp(loadPackages())
@@ -196,4 +198,4 @@ if __name__ == "__main__":
    print(pack2)
    troe = PackageGroup('Domain Lands', [pack1,pack2])
    print(troe)
-
+   '''
