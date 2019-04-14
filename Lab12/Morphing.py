@@ -44,10 +44,7 @@ def loadTriangles(leftPointFilePath, rightPointFilePath):
         temp = np.array(temp)
         rightTriangles.append(Triangle(temp))
 
-    result = tuple(leftTriangles,)
-    result += tuple(rightTriangles,)
-
-    return result
+    return leftTriangles, rightTriangles
 
 class Triangle:
     def __init__(self, vertices):
@@ -64,18 +61,12 @@ class Triangle:
 
 class Morpher:
     def __init__(self,leftImage,leftTriangles,rightImage,rightTriangles):
-        if isinstance(leftImage, np.array):
-            for element in leftImage.flatten():
-                if isinstance(element,np.uint8) == False:
-                    raise TypeError("leftImage must be type uint8")
-        else:
-            raise TypeError("leftImage must be an array")
-        if isinstance(rightImage, np.array):
-            for element in rightImage.flatten():
-                if isinstance(element,np.uint8) == False:
-                    raise TypeError("leftImage must be type uint8")
-        else:
-            raise TypeError("leftImage must be an array")
+        for element in leftImage.flatten():
+            if isinstance(element,np.uint8) == False:
+                raise TypeError("leftImage must be type uint8")
+        for element in rightImage.flatten():
+            if isinstance(element,np.uint8) == False:
+                raise TypeError("leftImage must be type uint8")
         for item in leftTriangles:
             if isinstance(item,Triangle) == False:
                 raise TypeError("leftTriangles must be type Triangle")
@@ -92,7 +83,21 @@ class Morpher:
         #calculate middle triangle that corresponds to the given a
         #transform left triangle onto the target triangle
         #transform the right triangle onto the right triangle
-        pass
+        x_m = []
+        y_m = []
+        middle_tri = []
+        for i in range(0, len(self.leftTriangles)):
+            x_m = []
+            y_m = []
+            for j in range(0,3):
+                x_m.append((1-alpha)*self.leftTriangles[i].vertices[j][0] + alpha*(self.rightTriangles[i].vertices[j][0]))
+                y_m.append((1 - alpha) * self.leftTriangles[i].vertices[j][1] + alpha * (self.rightTriangles[i].vertices[j][1]))
+            temp = [[x_m[0],y_m[0]],[x_m[1],y_m[1]],[x_m[2],y_m[2]]]
+            temp = np.array(temp)
+            middle_tri.append(Triangle(temp))
+        
+        # for point in tri:
+        #    print(point)
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -105,4 +110,16 @@ if __name__ == "__main__":
     new_triangle = Triangle(t)
     points_left = "~ee364/DataFolder/Lab12/TestData/points.left.txt"
     points_right = "~ee364/DataFolder/Lab12/TestData/points.right.txt"
-    loadTriangles(points_left,points_right)
+    leftTriangles, rightTriangles = loadTriangles(points_left, points_right)
+    TestFolder = "~ee364/DataFolder/Lab12/TestData/"
+    leftImagePath = os.path.join(TestFolder, 'LeftGray.png')
+    rightImagePath = os.path.join(TestFolder, 'RightGray.png')
+    expectedPath = os.path.join(TestFolder, 'Alpha50Gray.png')
+    from imageio import imread as libread
+    def imread(filePath):
+        startImage = libread(filePath)
+        return np.array(startImage)
+    leftImage = imread(leftImagePath)
+    rightImage = imread(rightImagePath)
+    morpher = Morpher(leftImage, leftTriangles, rightImage, rightTriangles)
+    actualImage = morpher.getImageAtAlpha(0.50)
