@@ -6,12 +6,12 @@
 #######################################################
 import os      # List of  module  import  statements
 import sys     # Each  one on a line
-from Lab13.measurement import calculateDistance
 import re
 import numpy as np
-import scipy
 import imageio
+from scipy import interpolate, spatial
 from scipy.spatial import Delaunay
+from matplotlib.path import Path
 # Module  level  Variables. (Write  this  statement  verbatim .)
 #######################################################
 
@@ -57,7 +57,61 @@ class Triangle:
         self.vertices = vertices
 
     def getPoints(self):
-        pass
+        #x, y = np.meshgrid(np.arange(300), np.arange(300))
+        #x, y = x.flatten(), y.flatten()
+        #points = np.vstack((x,y)).T
+        #p = Path(self.vertices)
+        #grid = p.contains_point(points)
+        #mask = grid.reshape(300,300)
+        #temp = np.vstack((self.vertices[1:],self.vertices[:1]))
+        #test = temp - self.vertices
+        #m = test[:,1]/test[:,0]
+        #c = self.vertices[:,1]-m*self.vertices[:,0]
+        #print(self.vertices)
+        #temp = [tuple(i) for i in self.vertices]
+        #print(temp)
+        #x, y = np.meshgrid(np.arange(300), np.arange(300))
+        #x, y = x.flatten(), y.flatten()
+        #points = np.vstack((x,y)).T
+        #print(len(points))
+        #p = Path(temp)
+        #print(p)
+        #grid = p.contains_point(points)
+        #mask = grid.reshape(300,300)
+        #print(mask)
+        #xval = ()
+        #area = 1/2 * abs(self.vertices[0][0](self.vertices[1][1]-self.vertices[2][1])
+         #                + self.vertices[1][0](self.vertices[2][1]-self.vertices[0][1])
+         #                + self.vertices[2][0](self.vertices[0][1]-self.vertices[1][1]))
+        x = np.array((self.vertices[0][0],self.vertices[1][0],self.vertices[2][0]),dtype='float64')
+        y = np.array((self.vertices[0][1],self.vertices[1][1],self.vertices[2][1]),dtype='float64')
+        #possible range of coordinates
+        x_range = np.arange(np.min(x),np.max(x)+1)
+        y_range = np.arange(np.min(y),np.max(y)+1)
+        X, Y = np.meshgrid(x_range,y_range) #fill in 1 for the triangle
+        xc = np.mean(x)
+        yc = np.mean(y)
+        #set points outside the triangle as 0
+        triangle = np.ones(X.shape,dtype=bool)
+        for i in range(3):
+            j = (i+1)%3
+            if x[i] == x[j]:
+                if xc>x.all():
+                    include = (X > x[i])
+                else:
+                    include = (X < x[i])
+            else:
+                slope = (y[j]-y[i])/(x[j]-x[i])
+                poly = np.poly1d([slope,y[i]-x[i]*slope])
+                if yc > poly(xc):
+                    include = (Y > poly(X))
+                else:
+                    include = (Y < poly(X))
+            triangle*=include
+
+        result = [[X[triangle][i],Y[triangle][i]] for i in range(0,len(X[triangle]))]
+        result = np.array(result,dtype = 'float64')
+        return result
 
 class Morpher:
     def __init__(self,leftImage,leftTriangles,rightImage,rightTriangles):
@@ -83,8 +137,7 @@ class Morpher:
         #calculate middle triangle that corresponds to the given a
         #transform left triangle onto the target triangle
         #transform the right triangle onto the right triangle
-        x_m = []
-        y_m = []
+        '''
         middle_tri = []
         for i in range(0, len(self.leftTriangles)):
             x_m = []
@@ -95,19 +148,39 @@ class Morpher:
             temp = [[x_m[0],y_m[0]],[x_m[1],y_m[1]],[x_m[2],y_m[2]]]
             temp = np.array(temp)
             middle_tri.append(Triangle(temp))
-        
-        # for point in tri:
-        #    print(point)
 
+        for i in range(0, len(self.leftTriangles)):
+
+            A = np.array([
+                        [middle_tri[i].vertices[0][0],middle_tri[i].vertices[0][1],1,0,0,0],
+                        [0,0,0,middle_tri[i].vertices[0][0],middle_tri[i].vertices[0][1],1],
+                        [middle_tri[i].vertices[1][0], middle_tri[i].vertices[1][1], 1, 0, 0, 0],
+                        [0, 0, 0, middle_tri[i].vertices[1][0], middle_tri[i].vertices[1][1], 1],
+                        [middle_tri[i].vertices[2][0], middle_tri[i].vertices[2][1], 1, 0, 0, 0],
+                        [0, 0, 0, middle_tri[i].vertices[2][0], middle_tri[i].vertices[2][1], 1],
+                        ], dtype = 'float64')
+            b = np.reshape(self.leftTriangles[i].vertices, (6,1))
+            print(b)
+            h = np.linalg.solve(A, b)
+            H = np.vstack([np.reshape(h, (2,3)), [0,0,1]])
+        '''
+        #create empty array of same dimensions as image
+        image1 = np.empty(self.leftImage.shape, dtype = 'float64')
+        image2 = np.empty(self.rightImage.shape, dtype = 'float64')
+        #interpolate left and right image to find the middle one
+        #for i in range(0,1):
+        #    x = np.arange(np.amin(self.leftTriangles), np.amax())
+        #    spline = interpolate.RectBivariateSpline(x, y, z, kx = 1, ky = 1)
 
 #-----------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     from pprint import pprint as pp
-    t = np.array([[np.float64(12.2),np.float64(12.2)],
-                  [np.float64(3.21),np.float64(4.09)],
-                  [np.float64(5.012),np.float64(6.112)]])
+    t = np.array([[np.float64(0.0),np.float64(0.0)],
+                  [np.float64(0.0),np.float64(5.0)],
+                  [np.float64(5.0),np.float64(0.0)]])
     pp(np.shape(t))
     new_triangle = Triangle(t)
+    pp(new_triangle.getPoints())
     points_left = "~ee364/DataFolder/Lab12/TestData/points.left.txt"
     points_right = "~ee364/DataFolder/Lab12/TestData/points.right.txt"
     leftTriangles, rightTriangles = loadTriangles(points_left, points_right)
