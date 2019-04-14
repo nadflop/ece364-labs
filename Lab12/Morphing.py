@@ -24,7 +24,7 @@ def loadTriangles(leftPointFilePath, rightPointFilePath):
     for element in data:
         array1.append([np.float64(element[0]),np.float64(element[-1])])
     points1 = np.array(array1)
-    left_tri = Delaunay(points1)
+    left_tri = Delaunay(points1) #create the left triangle
 
     array2 = []
     with open(DataPath2, "r") as f:
