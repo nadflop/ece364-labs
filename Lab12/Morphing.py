@@ -11,13 +11,43 @@ import re
 import numpy as np
 import scipy
 import imageio
+from scipy.spatial import Delaunay
 # Module  level  Variables. (Write  this  statement  verbatim .)
 #######################################################
 
 def loadTriangles(leftPointFilePath, rightPointFilePath):
-    pass
+    DataPath1 = os.path.expanduser(leftPointFilePath)
+    DataPath2 = os.path.expanduser(rightPointFilePath)
+    array1 = []
+    with open(DataPath1, "r") as f:
+        data = [line.strip().split(' ') for line in f.read().splitlines()]
+    for element in data:
+        array1.append([np.float64(element[0]),np.float64(element[-1])])
+    points1 = np.array(array1)
+    left_tri = Delaunay(points1)
 
-    #return tuple(leftTriangles, rightTriangles)
+    array2 = []
+    with open(DataPath2, "r") as f:
+        data = [line.strip().split(' ') for line in f.read().splitlines()]
+    for element in data:
+        array2.append([np.float64(element[0]),np.float64(element[-1])])
+
+    leftTriangles = []
+    rightTriangles = []
+    for coord in points1[left_tri.simplices]:
+        leftTriangles.append(Triangle(coord))
+        temp = []
+        for element in coord:
+            for item in array1:
+                if element[0] == item[0] and element[1] == item[1]:
+                    temp.append(array2[array1.index(item)])
+        temp = np.array(temp)
+        rightTriangles.append(Triangle(temp))
+
+    result = tuple(leftTriangles,)
+    result += tuple(rightTriangles,)
+
+    return result
 
 class Triangle:
     def __init__(self, vertices):
@@ -73,3 +103,6 @@ if __name__ == "__main__":
                   [np.float64(5.012),np.float64(6.112)]])
     pp(np.shape(t))
     new_triangle = Triangle(t)
+    points_left = "~ee364/DataFolder/Lab12/TestData/points.left.txt"
+    points_right = "~ee364/DataFolder/Lab12/TestData/points.right.txt"
+    loadTriangles(points_left,points_right)
