@@ -6,12 +6,11 @@
 #######################################################
 import os      # List of  module  import  statements
 import sys     # Each  one on a line
-import re
 import numpy as np
 import imageio
 from scipy import interpolate, spatial
 from scipy.spatial import Delaunay
-from matplotlib.path import Path
+from PIL import ImageDraw, Image
 # Module  level  Variables. (Write  this  statement  verbatim .)
 #######################################################
 
@@ -57,8 +56,10 @@ class Triangle:
         self.vertices = vertices
 
     def getPoints(self):
+        #got this algorithm from stackoverflow
         x = np.array((self.vertices[0][0],self.vertices[1][0],self.vertices[2][0]),dtype='float64')
         y = np.array((self.vertices[0][1],self.vertices[1][1],self.vertices[2][1]),dtype='float64')
+
         #possible range of coordinates
         x_range = np.arange(np.min(x),np.max(x)+1)
         y_range = np.arange(np.min(y),np.max(y)+1)
@@ -70,7 +71,7 @@ class Triangle:
         for i in range(3):
             j = (i+1)%3
             if x[i] == x[j]:
-                if xc>x.all():
+                if xc>x[i]:
                     include = (X > x[i])
                 else:
                     include = (X < x[i])
@@ -133,16 +134,15 @@ class Morpher:
         #do affine transformation for left triangle to the target triangle
         xrange1 = np.arange(0, self.leftImage.shape[0])
         yrange1 = np.arange(0, self.leftImage.shape[1])
-        spline_left = interpolate.RectBivariateSpline(xrange1, yrange1, self.leftImage)
+        spline_left = interpolate.RectBivariateSpline(xrange1, yrange1, self.leftImage,kx=1,ky=1)
         xrange2 = np.arange(0, self.rightImage.shape[0])
         yrange2 = np.arange(0, self.rightImage.shape[1])
-        spline_right = interpolate.RectBivariateSpline(xrange2, yrange2, self.rightImage)
-        print(len(self.leftTriangles))
-        print(len(self.rightTriangles))
+        spline_right = interpolate.RectBivariateSpline(xrange2, yrange2, self.rightImage,kx=1,ky=1)
+
         for j in range(len(self.leftTriangles)):
             #find forward projection
             H_left = self._process(self.leftTriangles[j],target[j].vertices)
-            H_right = self._process(self.rightTriangles[j], target[j].vertices)
+            H_right = self._process(self.rightTriangles[j],target[j].vertices)
             #find inverse projection
             hInv_left = np.linalg.inv(H_left)
             hInv_right = np.linalg.inv(H_right)
@@ -150,7 +150,7 @@ class Morpher:
             for points in target[j].getPoints():
                 c = np.array([points[0],points[1],1])
                 c = np.reshape(c, (3,1))
-                orig_left = np.matmul(hInv_left,c) #find the
+                orig_left = np.matmul(hInv_left,c)
                 orig_right = np.matmul(hInv_right,c)
                 image1[int(points[1]),int(points[0])] = np.round((1-alpha)*spline_left.ev(orig_left[1],orig_left[0])
                                                + (alpha)*spline_right.ev(orig_right[1],orig_right[0]))
@@ -169,6 +169,7 @@ if __name__ == "__main__":
     pp(np.shape(t))
     new_triangle = Triangle(t)
     pp(new_triangle.getPoints())
+    
     points_left = "~ee364/DataFolder/Lab12/TestData/points.left.txt"
     points_right = "~ee364/DataFolder/Lab12/TestData/points.right.txt"
     leftTriangles, rightTriangles = loadTriangles(points_left, points_right)
@@ -194,5 +195,5 @@ if __name__ == "__main__":
     #    image.show()
     #    plt.show()
     print(actualImage.shape)
-    imageio.imwrite('test.jpg', actualImage)
+    imageio.imwrite('test.png', actualImage)
     '''
