@@ -133,6 +133,22 @@ class Morpher:
         self.rightImage = rightImage
         self.rightTriangles = rightTriangles
 
+    def _process(self, src, dest):
+
+        A = np.array([
+            [src.vertices[0][0], src.vertices[0][1], 1, 0, 0, 0],
+            [0, 0, 0, src.vertices[0][0], src.vertices[0][1], 1],
+            [src.vertices[1][0], src.vertices[1][1], 1, 0, 0, 0],
+            [0, 0, 0, src.vertices[1][0], src.vertices[1][1], 1],
+            [src.vertices[2][0], src.vertices[2][1], 1, 0, 0, 0],
+            [0, 0, 0, src.vertices[2][0], src.vertices[2][1], 1],
+        ], dtype='float64')
+        b = np.reshape(dest, (6, 1))
+        h = np.linalg.solve(A, b)
+        H = np.vstack([np.reshape(h, (2, 3)), [0, 0, 1]])
+
+        return H
+
     def getImageAtAlpha(self, alpha):
         #calculate middle triangle that corresponds to the given a
         #transform left triangle onto the target triangle
@@ -167,11 +183,54 @@ class Morpher:
         #create empty array of same dimensions as image
         image1 = np.empty(self.leftImage.shape, dtype = 'float64')
         image2 = np.empty(self.rightImage.shape, dtype = 'float64')
-        #interpolate left and right image to find the middle one
-        #for i in range(0,1):
-        #    x = np.arange(np.amin(self.leftTriangles), np.amax())
-        #    spline = interpolate.RectBivariateSpline(x, y, z, kx = 1, ky = 1)
+        '''
+        middle_tri = []
+        for i in range(0, len(self.leftTriangles)):
+            x_m = []
+            y_m = []
+            for j in range(0, 3):
+                x_m.append((1 - alpha) * self.leftTriangles[i].vertices[j][0] + alpha * (
+                self.rightTriangles[i].vertices[j][0]))
+                y_m.append((1 - alpha) * self.leftTriangles[i].vertices[j][1] + alpha * (
+                self.rightTriangles[i].vertices[j][1]))
+            temp = [[x_m[0], y_m[0]], [x_m[1], y_m[1]], [x_m[2], y_m[2]]]
+            temp = np.array(temp)
+            middle_tri.append(Triangle(temp))
+        #process all the triangles
 
+        #for i in range(0, len(self.leftTriangles)):
+            #self._process(src=self.leftTriangles[i],dest=middle_tri[i],i=i)
+        '''
+        target = []
+        #create the middle triangle
+        for i in range(len(self.leftTriangles)):
+            target.append(Triangle((1-alpha)*self.leftTriangles[i].vertices + alpha*self.rightTriangles[i].vertices))
+        #do affine transformation for left triangle to the target triangle
+        xrange1 = np.arange(0, self.leftImage.shape[0])
+        yrange1 = np.arange(0, self.leftImage.shape[1])
+        spline_left = interpolate.RectBivariateSpline(xrange1, yrange1, self.leftImage)
+        xrange2 = np.arange(0, self.rightImage.shape[0])
+        yrange2 = np.arange(0, self.rightImage.shape[1])
+        spline_right = interpolate.RectBivariateSpline(xrange2, yrange2, self.rightImage)
+        for j in range(len(self.leftTriangles)):
+            #find forward projection
+            H_left = self._process(self.leftTriangles[j],target[j].vertices)
+            #find inverse projection
+            hInv_left = np.linalg.inv(H_left)
+            H_right = self._process(self.rightTriangles[j], target[j].vertices)
+            hInv_right = np.linalg.inv(H_right)
+            #iterate over the points in the target triangle
+            for points in target[j].getPoints():
+                c = np.array([points[0],points[1],1])
+                c = np.reshape(c, (3,1))
+                orig_left = np.matmul(hInv_left,c)
+                orig_right = np.matmul(hInv_right,c)
+                image1[int(points[1]),int(points[0])] = np.round((1-alpha)*spline_left.ev(orig_left[1],orig_left[0])
+                                               + (alpha)*spline_right.ev(orig_right[1],orig_right[0]))
+
+        return image1.astype('uint8')
+        #spline = interpolate.RectBivariateSpline(x, y, self.leftImage, kx = 1, ky = 1)
+        #print(spline)
 #-----------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     from pprint import pprint as pp
@@ -196,3 +255,14 @@ if __name__ == "__main__":
     rightImage = imread(rightImagePath)
     morpher = Morpher(leftImage, leftTriangles, rightImage, rightTriangles)
     actualImage = morpher.getImageAtAlpha(0.50)
+    #num_photos, x, y, z = actualImage.shape
+    #morph_list = []
+    #from PIL import Image as im
+    #for i in range(0, num_photos):
+    #    image = im.fromarray(actualImage[i,:,:,:], 'RGB')
+    #    morph_list.append(actualImage[i,:,:,:])
+    #    image.save('photo.jpg')
+    #    image.show()
+    #    plt.show()
+    print(actualImage.shape)
+    imageio.imwrite('test.jpg', actualImage)
