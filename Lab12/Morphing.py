@@ -57,32 +57,6 @@ class Triangle:
         self.vertices = vertices
 
     def getPoints(self):
-        #x, y = np.meshgrid(np.arange(300), np.arange(300))
-        #x, y = x.flatten(), y.flatten()
-        #points = np.vstack((x,y)).T
-        #p = Path(self.vertices)
-        #grid = p.contains_point(points)
-        #mask = grid.reshape(300,300)
-        #temp = np.vstack((self.vertices[1:],self.vertices[:1]))
-        #test = temp - self.vertices
-        #m = test[:,1]/test[:,0]
-        #c = self.vertices[:,1]-m*self.vertices[:,0]
-        #print(self.vertices)
-        #temp = [tuple(i) for i in self.vertices]
-        #print(temp)
-        #x, y = np.meshgrid(np.arange(300), np.arange(300))
-        #x, y = x.flatten(), y.flatten()
-        #points = np.vstack((x,y)).T
-        #print(len(points))
-        #p = Path(temp)
-        #print(p)
-        #grid = p.contains_point(points)
-        #mask = grid.reshape(300,300)
-        #print(mask)
-        #xval = ()
-        #area = 1/2 * abs(self.vertices[0][0](self.vertices[1][1]-self.vertices[2][1])
-         #                + self.vertices[1][0](self.vertices[2][1]-self.vertices[0][1])
-         #                + self.vertices[2][0](self.vertices[0][1]-self.vertices[1][1]))
         x = np.array((self.vertices[0][0],self.vertices[1][0],self.vertices[2][0]),dtype='float64')
         y = np.array((self.vertices[0][1],self.vertices[1][1],self.vertices[2][1]),dtype='float64')
         #possible range of coordinates
@@ -150,57 +124,8 @@ class Morpher:
         return H
 
     def getImageAtAlpha(self, alpha):
-        #calculate middle triangle that corresponds to the given a
-        #transform left triangle onto the target triangle
-        #transform the right triangle onto the right triangle
-        '''
-        middle_tri = []
-        for i in range(0, len(self.leftTriangles)):
-            x_m = []
-            y_m = []
-            for j in range(0,3):
-                x_m.append((1-alpha)*self.leftTriangles[i].vertices[j][0] + alpha*(self.rightTriangles[i].vertices[j][0]))
-                y_m.append((1 - alpha) * self.leftTriangles[i].vertices[j][1] + alpha * (self.rightTriangles[i].vertices[j][1]))
-            temp = [[x_m[0],y_m[0]],[x_m[1],y_m[1]],[x_m[2],y_m[2]]]
-            temp = np.array(temp)
-            middle_tri.append(Triangle(temp))
-
-        for i in range(0, len(self.leftTriangles)):
-
-            A = np.array([
-                        [middle_tri[i].vertices[0][0],middle_tri[i].vertices[0][1],1,0,0,0],
-                        [0,0,0,middle_tri[i].vertices[0][0],middle_tri[i].vertices[0][1],1],
-                        [middle_tri[i].vertices[1][0], middle_tri[i].vertices[1][1], 1, 0, 0, 0],
-                        [0, 0, 0, middle_tri[i].vertices[1][0], middle_tri[i].vertices[1][1], 1],
-                        [middle_tri[i].vertices[2][0], middle_tri[i].vertices[2][1], 1, 0, 0, 0],
-                        [0, 0, 0, middle_tri[i].vertices[2][0], middle_tri[i].vertices[2][1], 1],
-                        ], dtype = 'float64')
-            b = np.reshape(self.leftTriangles[i].vertices, (6,1))
-            print(b)
-            h = np.linalg.solve(A, b)
-            H = np.vstack([np.reshape(h, (2,3)), [0,0,1]])
-        '''
         #create empty array of same dimensions as image
         image1 = np.empty(self.leftImage.shape, dtype = 'float64')
-        image2 = np.empty(self.rightImage.shape, dtype = 'float64')
-        '''
-        middle_tri = []
-        for i in range(0, len(self.leftTriangles)):
-            x_m = []
-            y_m = []
-            for j in range(0, 3):
-                x_m.append((1 - alpha) * self.leftTriangles[i].vertices[j][0] + alpha * (
-                self.rightTriangles[i].vertices[j][0]))
-                y_m.append((1 - alpha) * self.leftTriangles[i].vertices[j][1] + alpha * (
-                self.rightTriangles[i].vertices[j][1]))
-            temp = [[x_m[0], y_m[0]], [x_m[1], y_m[1]], [x_m[2], y_m[2]]]
-            temp = np.array(temp)
-            middle_tri.append(Triangle(temp))
-        #process all the triangles
-
-        #for i in range(0, len(self.leftTriangles)):
-            #self._process(src=self.leftTriangles[i],dest=middle_tri[i],i=i)
-        '''
         target = []
         #create the middle triangle
         for i in range(len(self.leftTriangles)):
@@ -212,18 +137,20 @@ class Morpher:
         xrange2 = np.arange(0, self.rightImage.shape[0])
         yrange2 = np.arange(0, self.rightImage.shape[1])
         spline_right = interpolate.RectBivariateSpline(xrange2, yrange2, self.rightImage)
+        print(len(self.leftTriangles))
+        print(len(self.rightTriangles))
         for j in range(len(self.leftTriangles)):
             #find forward projection
             H_left = self._process(self.leftTriangles[j],target[j].vertices)
+            H_right = self._process(self.rightTriangles[j], target[j].vertices)
             #find inverse projection
             hInv_left = np.linalg.inv(H_left)
-            H_right = self._process(self.rightTriangles[j], target[j].vertices)
             hInv_right = np.linalg.inv(H_right)
             #iterate over the points in the target triangle
             for points in target[j].getPoints():
                 c = np.array([points[0],points[1],1])
                 c = np.reshape(c, (3,1))
-                orig_left = np.matmul(hInv_left,c)
+                orig_left = np.matmul(hInv_left,c) #find the
                 orig_right = np.matmul(hInv_right,c)
                 image1[int(points[1]),int(points[0])] = np.round((1-alpha)*spline_left.ev(orig_left[1],orig_left[0])
                                                + (alpha)*spline_right.ev(orig_right[1],orig_right[0]))
@@ -233,6 +160,8 @@ class Morpher:
         #print(spline)
 #-----------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
+    ...
+    '''
     from pprint import pprint as pp
     t = np.array([[np.float64(0.0),np.float64(0.0)],
                   [np.float64(0.0),np.float64(5.0)],
@@ -254,7 +183,7 @@ if __name__ == "__main__":
     leftImage = imread(leftImagePath)
     rightImage = imread(rightImagePath)
     morpher = Morpher(leftImage, leftTriangles, rightImage, rightTriangles)
-    actualImage = morpher.getImageAtAlpha(0.50)
+    actualImage = morpher.getImageAtAlpha(0.75)
     #num_photos, x, y, z = actualImage.shape
     #morph_list = []
     #from PIL import Image as im
@@ -266,3 +195,4 @@ if __name__ == "__main__":
     #    plt.show()
     print(actualImage.shape)
     imageio.imwrite('test.jpg', actualImage)
+    '''
