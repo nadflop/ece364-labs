@@ -56,10 +56,10 @@ class Triangle:
         self.vertices = vertices
 
     def getPoints(self):
+        '''
         #got this algorithm from stackoverflow
         x = np.array((self.vertices[0][0],self.vertices[1][0],self.vertices[2][0]),dtype='float64')
         y = np.array((self.vertices[0][1],self.vertices[1][1],self.vertices[2][1]),dtype='float64')
-
         #possible range of coordinates
         x_range = np.arange(np.min(x),np.max(x)+1)
         y_range = np.arange(np.min(y),np.max(y)+1)
@@ -68,7 +68,7 @@ class Triangle:
         yc = np.mean(y)
         #set points outside the triangle as 0
         triangle = np.ones(X.shape,dtype=bool)
-        for i in range(3):
+        for i in range(0,3):
             j = (i+1)%3
             if x[i] == x[j]:
                 if xc>x[i]:
@@ -86,6 +86,26 @@ class Triangle:
 
         result = [[X[triangle][i],Y[triangle][i]] for i in range(0,len(X[triangle]))]
         result = np.array(result,dtype = 'float64')
+
+        '''
+        (x0, y0) = self.vertices[0]
+        (x1, y1) = self.vertices[1]
+        (x2, y2) = self.vertices[2]
+        image = Image.new('L', (2000,2000), color=0)
+        draw = ImageDraw.Draw(image)
+        draw.polygon([(x0,y0),(x1,y1),(x2,y2)],fill=255)
+        imageA = np.array(image)
+        zeroes = np.nonzero(imageA)
+        temp = np.zeros(shape=(zeroes[0].size,2))
+
+        for i in range(temp.shape[0]):
+            x = zeroes[0][i]
+            y = zeroes[1][i]
+            temp[i][0] = x
+            temp[i][1] = y
+
+        result = temp
+
         return result
 
 class Morpher:
@@ -130,14 +150,13 @@ class Morpher:
         target = []
         #create the middle triangle
         for i in range(len(self.leftTriangles)):
-            target.append(Triangle((1-alpha)*self.leftTriangles[i].vertices + alpha*self.rightTriangles[i].vertices))
+            target.append(Triangle(np.round((1-alpha)*self.leftTriangles[i].vertices + alpha*self.rightTriangles[i].vertices)))
         #do affine transformation for left triangle to the target triangle
-        xrange1 = np.arange(0, self.leftImage.shape[0])
-        yrange1 = np.arange(0, self.leftImage.shape[1])
-        spline_left = interpolate.RectBivariateSpline(xrange1, yrange1, self.leftImage,kx=1,ky=1)
-        xrange2 = np.arange(0, self.rightImage.shape[0])
-        yrange2 = np.arange(0, self.rightImage.shape[1])
-        spline_right = interpolate.RectBivariateSpline(xrange2, yrange2, self.rightImage,kx=1,ky=1)
+        xrange1, yrange1 = self.leftImage.shape
+        xrange2, yrange2 = self.rightImage.shape
+
+        spline_left = interpolate.RectBivariateSpline(np.arange(0, xrange1), np.arange(0, yrange1), self.leftImage)
+        spline_right = interpolate.RectBivariateSpline(np.arange(0,xrange2), np.arange(0, yrange2), self.rightImage)
 
         for j in range(len(self.leftTriangles)):
             #find forward projection
@@ -152,8 +171,9 @@ class Morpher:
                 c = np.reshape(c, (3,1))
                 orig_left = np.matmul(hInv_left,c)
                 orig_right = np.matmul(hInv_right,c)
-                image1[int(points[1]),int(points[0])] = np.round((1-alpha)*spline_left.ev(orig_left[1],orig_left[0])
-                                               + (alpha)*spline_right.ev(orig_right[1],orig_right[0]))
+                #image1[int(points[1]),int(points[0])] = np.round((1-alpha)*spline_left.ev(orig_left[1],orig_left[0])
+                #                                                 + (alpha)*spline_right.ev(orig_right[1],orig_right[0]))
+                image1[int(points[1]),int(points[0])] = (1-alpha)*spline_left.ev(orig_left[1],orig_left[0]) + (alpha)*spline_right.ev(orig_right[1],orig_right[0])
 
         return image1.astype('uint8')
         #spline = interpolate.RectBivariateSpline(x, y, self.leftImage, kx = 1, ky = 1)
@@ -161,7 +181,7 @@ class Morpher:
 #-----------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     ...
-    '''
+
     from pprint import pprint as pp
     t = np.array([[np.float64(0.0),np.float64(0.0)],
                   [np.float64(0.0),np.float64(5.0)],
@@ -169,7 +189,7 @@ if __name__ == "__main__":
     pp(np.shape(t))
     new_triangle = Triangle(t)
     pp(new_triangle.getPoints())
-    
+
     points_left = "~ee364/DataFolder/Lab12/TestData/points.left.txt"
     points_right = "~ee364/DataFolder/Lab12/TestData/points.right.txt"
     leftTriangles, rightTriangles = loadTriangles(points_left, points_right)
@@ -184,7 +204,7 @@ if __name__ == "__main__":
     leftImage = imread(leftImagePath)
     rightImage = imread(rightImagePath)
     morpher = Morpher(leftImage, leftTriangles, rightImage, rightTriangles)
-    actualImage = morpher.getImageAtAlpha(0.75)
+    actualImage = morpher.getImageAtAlpha(0)
     #num_photos, x, y, z = actualImage.shape
     #morph_list = []
     #from PIL import Image as im
@@ -196,4 +216,3 @@ if __name__ == "__main__":
     #    plt.show()
     print(actualImage.shape)
     imageio.imwrite('test.png', actualImage)
-    '''
