@@ -111,7 +111,7 @@ class Morphing(QMainWindow, Ui_Dialog):
                 QKeyEvent.ignore()
 
      def leftImage(self):
-         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open Image file ...', filter="PNG files (*.png)")
+         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open Image file ...', filter="JPG files (*.jpg)")
 
          if not filePath:
              return
@@ -137,12 +137,12 @@ class Morphing(QMainWindow, Ui_Dialog):
              for x, y in self.points1:
                  scene.addEllipse(x, y, 20, 20, Qt.transparent, Qt.red)
          else:
-             pass
+             open(self.image1Path + '.txt').close()
 
          self.scene1 = scene
 
      def rightImage(self):
-         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open Image file ...', filter="PNG files (*.png)")
+         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open Image file ...', filter="JPG files (*.jpg)")
 
          if not filePath:
              return
@@ -170,7 +170,7 @@ class Morphing(QMainWindow, Ui_Dialog):
              for x, y in self.points2:
                  scene.addEllipse(x, y, 20, 20, Qt.transparent, Qt.red)
          else:
-             pass
+             open(self.image2Path + '.txt').close()
 
          self.scene2 = scene
 
