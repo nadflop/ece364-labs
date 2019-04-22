@@ -11,7 +11,6 @@ from Lab12.MorphingGUI import *
 from Lab12.Morphing import *
 from PyQt5.QtCore import Qt
 
-
 class Morphing(QMainWindow, Ui_Dialog):
 
      def __init__(self, parent=None):
@@ -40,9 +39,6 @@ class Morphing(QMainWindow, Ui_Dialog):
          self.hasPoints = False
          self.leftTriangles = 0
          self.rightTriangles = 0
-     #def mouseReleaseEvent(self, a0: QtGui.QMouseEvent):
-     #    print('(', QtGui.QMouseEvent.x(), ',', QtGui.QMouseEvent.y(), ')')
-     #keyEvent.key ==
 
      def printValue(self):
          self.lineEdit.setText(str(self.horizontalSlider.sliderPosition() / 20))
@@ -78,7 +74,6 @@ class Morphing(QMainWindow, Ui_Dialog):
             self.scene2.addEllipse(x*1440/256,y*1080/192,20,20, Qt.transparent, Qt.green)
             self.count2 += 1
             self.status = 'RIGHT'
-            #self.mousePressEvent = self.exitSelection
 
      def exitSelection(self, event):
          if self.count1 == 1 and self.count2 == 1:# and self.status == 'RIGHT':
@@ -137,7 +132,7 @@ class Morphing(QMainWindow, Ui_Dialog):
              for x, y in self.points1:
                  scene.addEllipse(x, y, 20, 20, Qt.transparent, Qt.red)
          else:
-             open(self.image1Path + '.txt').close()
+             pass
 
          self.scene1 = scene
 
@@ -170,7 +165,7 @@ class Morphing(QMainWindow, Ui_Dialog):
              for x, y in self.points2:
                  scene.addEllipse(x, y, 20, 20, Qt.transparent, Qt.red)
          else:
-             open(self.image2Path + '.txt').close()
+             pass
 
          self.scene2 = scene
 
