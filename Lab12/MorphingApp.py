@@ -18,6 +18,7 @@ class Morphing(QMainWindow, Ui_Dialog):
          super(Morphing, self).__init__(parent)
          self.setupUi(self)
          self.lineEdit.setEnabled(False)
+         self.lineEdit.setText('0.0')
          self.horizontalSlider.setEnabled(False)
          self.pushButton.setEnabled(False)
          self.checkBox.setEnabled(False)
@@ -94,19 +95,25 @@ class Morphing(QMainWindow, Ui_Dialog):
         if QKeyEvent.key() == QtCore.Qt.Key_Backspace:
             #delete the previous dot
             if self.status == 'LEFT' and self.count2 == 0 and self.count1 == 1:
-                self.scene1.removeItem(self.scene1.items()[0])
+                for i in self.scene1.items():
+                    if type(i) == QtWidgets.QGraphicsEllipseItem:
+                        self.scene1.removeItem(i)
+                        break
                 self.count1 = 0
                 QKeyEvent.accept()
             elif self.status == 'RIGHT' and self.count1 == 1 and self.count2 == 1:
-                self.scene2.removeItem(self.scene2.items()[0])
+                for i in self.scene2.items():
+                    if type(i) == QtWidgets.QGraphicsEllipseItem:
+                        self.scene2.removeItem(i)
+                        break
                 self.count2 = 0
                 QKeyEvent.accept()
-            else:
-                self.status = 'LEFT'
-                QKeyEvent.ignore()
+            #else:
+            #    self.status = 'LEFT'
+            #    QKeyEvent.ignore()
 
      def leftImage(self):
-         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open Image file ...', filter="JPG files (*.jpg)")
+         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open Image file ...', filter="PNG JPG files (*.jpg *.png)")
 
          if not filePath:
              return
@@ -120,6 +127,7 @@ class Morphing(QMainWindow, Ui_Dialog):
          self.graphicsView.setScene(scene)
          self.graphicsView.fitInView(self.graphicsView.sceneRect(), QtCore.Qt.KeepAspectRatio)
          self.image1Path = filePath
+
          self.enableBtn()
          array = []
          if os.path.isfile(self.image1Path + '.txt'):
@@ -137,7 +145,7 @@ class Morphing(QMainWindow, Ui_Dialog):
          self.scene1 = scene
 
      def rightImage(self):
-         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open Image file ...', filter="JPG files (*.jpg)")
+         filePath, _ = QFileDialog.getOpenFileName(self, caption='Open Image file ...', filter="PNG JPG files (*.jpg *.png)")
 
          if not filePath:
              return
