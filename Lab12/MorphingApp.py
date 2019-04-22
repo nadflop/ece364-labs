@@ -215,9 +215,7 @@ class Morphing(QMainWindow, Ui_Dialog):
      def clearTriangles(self):
          if self.checkBox.isChecked() == True:
              if os.path.isfile(self.image1Path + '.txt') and os.path.isfile(self.image2Path + '.txt'):
-                 self.leftTriangles, self.rightTriangles = loadTriangles(
-                     self.image1Path + '.txt',
-                     self.image2Path + '.txt') #replace with image1 and image2 path later
+                 self.leftTriangles, self.rightTriangles = loadTriangles(self.image1Path + '.txt', self.image2Path + '.txt') #replace with image1 and image2 path later
              self.showTriangles()
          else:
              if self.image1Path != None and self.image2Path != None:
@@ -241,9 +239,9 @@ class Morphing(QMainWindow, Ui_Dialog):
             self.clearTriangles()
         #write confirmed points to file
         with open(self.image1Path + '.txt', 'a+') as f:
-            f.writelines([str(np.round(coord[0] * 1440 / 256)) + ' ' + str(np.round(coord[1]*1080 / 192)) + '\n' for coord in self.startPoints.tolist()])
+            f.writelines([str(np.round(coord[0] * 1440 / 256)) + '   ' + str(np.round(coord[1]*1080 / 192)) + '\n' for coord in self.startPoints.tolist()])
         with open(self.image2Path + '.txt', 'a+') as f:
-            f.writelines([str(np.round(coord[0] * 1440 / 256)) + ' ' + str(np.round(coord[1]*1080 / 192)) + '\n' for coord in self.endPoints.tolist()])
+            f.writelines([str(np.round(coord[0] * 1440 / 256)) + '   ' + str(np.round(coord[1]*1080 / 192)) + '\n' for coord in self.endPoints.tolist()])
 
 if __name__ == "__main__":
      currentApp = QApplication(sys.argv)
